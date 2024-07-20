@@ -3,6 +3,7 @@ package dev.theduardomaciel.javaspring.repository;
 import dev.theduardomaciel.javaspring.handler.ObligatoryArgumentException;
 import dev.theduardomaciel.javaspring.model.User;
 import dev.theduardomaciel.javaspring.handler.BusinessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
