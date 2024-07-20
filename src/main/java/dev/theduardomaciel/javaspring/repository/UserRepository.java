@@ -1,6 +1,8 @@
 package dev.theduardomaciel.javaspring.repository;
 
+import dev.theduardomaciel.javaspring.handler.ObligatoryArgumentException;
 import dev.theduardomaciel.javaspring.model.User;
+import dev.theduardomaciel.javaspring.handler.BusinessException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,6 +13,9 @@ import java.util.List;
 @Repository
 public class UserRepository {
 	public void saveUser(User user) {
+		if (user.getUsername() == null)
+			throw new ObligatoryArgumentException("username");
+		
 		if(user.getId() == null)
 			System.out.println("SAVE - Recebendo o usuário na camada de repositório");
 		else
