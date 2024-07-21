@@ -31,23 +31,33 @@ public class JWTCreator {
 	}
 	
 	public static JWTObject create(String token, String prefix, String key)
-			throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException {
+			throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, JwtException {
 		
-		token = token.split(" ")[1];
-		System.out.println(token);
+		token = token.replace(prefix + " ", "");
 		
+		Jws<Claims> jws;
 		SecretKey signingKey = Keys.hmacShaKeyFor(key.getBytes());
 		
-		Claims claims = Jwts.parser().decryptWith(signingKey).build().parseEncryptedClaims(token).getBody();
-		
-		JWTObject object = new JWTObject();
-		
-		object.setSubject(claims.getSubject());
-		object.setExpiration(claims.getExpiration());
-		object.setIssuedAt(claims.getIssuedAt());
-		object.setRoles(String.valueOf(claims.get(ROLES_AUTHORITIES)));
-		
-		return object;
+		try {
+			jws = Jwts.parser()
+					.verifyWith(signingKey)
+					.build()
+					.parseSignedClaims(token);
+			
+			Claims claims = jws.getPayload();
+			
+			JWTObject object = new JWTObject();
+			object.setSubject(claims.getSubject());
+			object.setExpiration(claims.getExpiration());
+			object.setIssuedAt(claims.getIssuedAt());
+			
+			object.setRoles((List) claims.get(ROLES_AUTHORITIES));
+			
+			return object;
+		} catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
+			System.out.println(e.getMessage());
+			throw new JwtException(e.getMessage());
+		}
 	}
 	
 	private static List<String> checkRoles(List<String> roles) {

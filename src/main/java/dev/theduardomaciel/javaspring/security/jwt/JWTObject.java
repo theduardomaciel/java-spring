@@ -38,7 +38,7 @@ public class JWTObject {
 		return roles;
 	}
 	
-	public void setRoles(String... roles) {
-		this.roles = Arrays.asList(roles);
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
 	}
 }

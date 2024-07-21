@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -43,8 +44,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			UndeclaredThrowableException exception = (UndeclaredThrowableException) e;
 			return handleBusinessException((BusinessException) exception.getUndeclaredThrowable(), request);
 		} else {
-			String message = messageSource.getMessage("error.server", new Object[]{e.getMessage()}, null);
-			ResponseError error = responseError(message,HttpStatus.INTERNAL_SERVER_ERROR);
+			ResponseError error = responseError(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 			return handleExceptionInternal(e, error, headers(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 		}
 	}
@@ -55,5 +55,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	private ResponseEntity<Object> handleBusinessException(BusinessException e, WebRequest request) {
 		ResponseError error = responseError(e.getMessage(), e.getStatusCode());
 		return handleExceptionInternal(e, error, headers(), e.getStatusCode(), request);
+	}
+	
+	@ExceptionHandler({IllegalArgumentException.class})
+	private ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
+		ResponseError error = responseError(e.getMessage(), HttpStatus.BAD_REQUEST);
+		return handleExceptionInternal(e, error, headers(), HttpStatus.BAD_REQUEST, request);
+	}
+	
+	@ExceptionHandler({AuthorizationDeniedException.class})
+	private ResponseEntity<Object> handleAuthorizationDeniedException(AuthorizationDeniedException e, WebRequest request) {
+		ResponseError error = responseError(e.getMessage(), HttpStatus.FORBIDDEN);
+		return handleExceptionInternal(e, error, headers(), HttpStatus.FORBIDDEN, request);
 	}
 }

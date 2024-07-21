@@ -29,9 +29,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+	private final JWTFilter jwtFilter;
+	
 	private final SecurityDatabaseService securityDatabaseService;
 	
-	public SecurityConfig(SecurityDatabaseService securityDatabaseService) {
+	public SecurityConfig(JWTFilter jwtFilter, SecurityDatabaseService securityDatabaseService) {
+		this.jwtFilter = jwtFilter;
 		this.securityDatabaseService = securityDatabaseService;
 	}
 	
@@ -51,7 +54,6 @@ public class SecurityConfig {
 				.cors(cors -> {
 				})
 				.csrf(AbstractHttpConfigurer::disable)
-				.addFilterAfter(new JWTFilter(), UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests(authorizeRequests ->
 						authorizeRequests
 								.requestMatchers(HttpMethod.POST, "/users").permitAll()
@@ -62,9 +64,9 @@ public class SecurityConfig {
 								.requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
 								.requestMatchers(
 										"/",
+										"/docs",
 										"/public/**",
-										"/h2-console/**")
-								.permitAll()
+										"/h2-console/**").permitAll()
 								// caso queira especificar um método: .requestMatchers(HttpMethod.GET, "/public/**").permitAll()
 								.anyRequest().authenticated()
 				)
@@ -73,21 +75,8 @@ public class SecurityConfig {
 						.sessionFixation().migrateSession()
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				)
+				.addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				.logout(withDefaults());
-		/*
-		* Para mudar a tela de login:
-		* padrão: .formLogin(withDefaults())
-		*   .formLogin(formLogin -> formLogin
-                .loginPage("/login")  // specify custom login page if needed
-                .permitAll()
-            )
-        * Para mudar a URL de logout:
-        * padrão: .logout(withDefaults())
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .permitAll()
-            );
-		* */
 		
 		return http.build();
 	}

@@ -41,7 +41,7 @@ public class LoginController {
 			JWTObject jwtObject = new JWTObject();
 			jwtObject.setIssuedAt(new Date(System.currentTimeMillis()));
 			jwtObject.setExpiration((new Date(System.currentTimeMillis() + JWTConfig.EXPIRATION)));
-			jwtObject.setRoles(user.getRoles().toString());
+			jwtObject.setRoles(user.getRoles());
 			session.setToken(JWTCreator.create(JWTConfig.PREFIX, JWTConfig.KEY, jwtObject));
 			
 			return session;
