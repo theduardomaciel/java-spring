@@ -1,31 +1,90 @@
 package dev.theduardomaciel.javaspring.model;
 
+import jakarta.persistence.*;
+
 import java.util.UUID;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "users")
 public class User {
-	private final String id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "user_id")
+	private Integer id;
+	
+	@Column(length = 50, nullable = false)
+	private String name;
+	
+	@Column(length = 20, nullable = false)
 	private String username;
+	
+	@Column(length = 100, nullable = false)
 	private String password;
 	
-	public User(String username, String password) {
-		this.id = UUID.randomUUID().toString();
-		this.username = username;
-		this.password = password;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "tab_user_roles", joinColumns = @JoinColumn(name = "user_id"))
+	@Column(name = "role_id")
+	private List<String> roles = new ArrayList<>();
+	
+	public User(){
+	
 	}
 	
-	public String getId() {
+	public User(String username){
+		this.username = username;
+	}
+	
+	public Integer getId() {
 		return id;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public String getUsername() {
 		return username;
 	}
 	
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public List<String> getRoles() {
+		return roles;
+	}
+	
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
+	
 	@Override
 	public String toString() {
 		return "User{" +
-				"username='" + username + '\'' +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", username='" + username + '\'' +
 				", password='" + password + '\'' +
+				", roles=" + roles +
 				'}';
 	}
 }

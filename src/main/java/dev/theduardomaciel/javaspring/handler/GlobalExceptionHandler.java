@@ -31,8 +31,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	// O método responseError() é responsável por retornar o corpo do erro com
 	// as informações necessárias que serão retornadas ao cliente.
-	private ResponseError responseError(String message, int statusCode) {
-		return new ResponseError(message, message, statusCode);
+	private ResponseError responseError(String message, HttpStatus statusCode) {
+		return new ResponseError(message, message, statusCode.value());
 	}
 	
 	// O método handleGeneral() intercepta as exceções do sistema e verifica
@@ -40,14 +40,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	private ResponseEntity<Object> handleGeneral(Exception e, WebRequest request) {
 		if (e.getClass().isAssignableFrom(UndeclaredThrowableException.class)) {
-			// Caso a exceção seja do tipo UndeclaredThrowableException, é feito um
-			// cast para BusinessException e tratado como tal.
 			UndeclaredThrowableException exception = (UndeclaredThrowableException) e;
 			return handleBusinessException((BusinessException) exception.getUndeclaredThrowable(), request);
 		} else {
-			// Caso não seja uma BusinessException, é lançada uma exceção genérica.
-			String message = messageSource.getMessage("error.internal-server-error", null, null);
-			ResponseError error = responseError(message, HttpStatus.INTERNAL_SERVER_ERROR.value());
+			String message = messageSource.getMessage("error.server", new Object[]{e.getMessage()}, null);
+			ResponseError error = responseError(message,HttpStatus.INTERNAL_SERVER_ERROR);
 			return handleExceptionInternal(e, error, headers(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 		}
 	}
@@ -56,7 +53,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	// contendo o nosso ResponseError devidamente estruturado.
 	@ExceptionHandler({BusinessException.class})
 	private ResponseEntity<Object> handleBusinessException(BusinessException e, WebRequest request) {
-		ResponseError error = responseError(e.getMessage(), e.getStatusCode().value());
+		ResponseError error = responseError(e.getMessage(), e.getStatusCode());
 		return handleExceptionInternal(e, error, headers(), e.getStatusCode(), request);
 	}
 }

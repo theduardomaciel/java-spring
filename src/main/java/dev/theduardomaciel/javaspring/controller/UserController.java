@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 // O Controller é como um "proxy", realizando um direcionamento entre o cliente e o repositório,
 // que possui a funcionalidade existente para manipular os dados
@@ -18,31 +19,25 @@ import java.util.List;
 public class UserController {
 	private final UserRepository userRepository;
 	
-	public UserController(@Autowired UserRepository userRepository) {
+	public UserController(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 	
 	@GetMapping()
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<User> getUsers() {
 		return userRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasRole('USER')")
-	public User getUser(@PathVariable("id") String id) {
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+	public Optional<User> getUser(@PathVariable("id") int id) {
 		return userRepository.findById(id);
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public void deleteUser(@PathVariable("id") String id) {
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public void deleteUser(@PathVariable("id") int id) {
 		userRepository.deleteById(id);
-	}
-	
-	@PutMapping()
-	@PreAuthorize("hasRole('ADMIN')")
-	public void updateUser(@RequestBody User user) {
-		userRepository.saveUser(user);
 	}
 }
