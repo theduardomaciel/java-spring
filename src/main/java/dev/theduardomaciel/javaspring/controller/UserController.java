@@ -2,6 +2,7 @@ package dev.theduardomaciel.javaspring.controller;
 
 import dev.theduardomaciel.javaspring.model.User;
 import dev.theduardomaciel.javaspring.repository.UserRepository;
+import dev.theduardomaciel.javaspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +19,11 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
 	private final UserRepository userRepository;
+	private final UserService userService;
 	
-	public UserController(UserRepository userRepository) {
+	public UserController(UserRepository userRepository, UserService userService) {
 		this.userRepository = userRepository;
+		this.userService = userService;
 	}
 	
 	@GetMapping()
@@ -39,5 +42,10 @@ public class UserController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public void deleteUser(@PathVariable("id") int id) {
 		userRepository.deleteById(id);
+	}
+	
+	@PostMapping
+	public void postUser(@RequestBody User user) {
+		userService.createUser(user);
 	}
 }

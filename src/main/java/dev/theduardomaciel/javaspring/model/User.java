@@ -25,15 +25,15 @@ public class User {
 	private String password;
 	
 	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "tab_user_roles", joinColumns = @JoinColumn(name = "user_id"))
+	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
 	@Column(name = "role_id")
 	private List<String> roles = new ArrayList<>();
 	
-	public User(){
+	public User() {
 	
 	}
 	
-	public User(String username){
+	public User(String username) {
 		this.username = username;
 	}
 	
