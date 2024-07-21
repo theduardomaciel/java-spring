@@ -3,6 +3,7 @@ package dev.theduardomaciel.javaspring.controller;
 import dev.theduardomaciel.javaspring.model.User;
 import dev.theduardomaciel.javaspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,21 +23,25 @@ public class UserController {
 	}
 	
 	@GetMapping()
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<User> getUsers() {
 		return userRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasRole('USER')")
 	public User getUser(@PathVariable("id") String id) {
 		return userRepository.findById(id);
 	}
 	
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public void deleteUser(@PathVariable("id") String id) {
 		userRepository.deleteById(id);
 	}
 	
 	@PutMapping()
+	@PreAuthorize("hasRole('ADMIN')")
 	public void updateUser(@RequestBody User user) {
 		userRepository.saveUser(user);
 	}

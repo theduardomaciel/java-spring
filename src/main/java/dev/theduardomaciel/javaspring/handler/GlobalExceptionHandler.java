@@ -46,7 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			return handleBusinessException((BusinessException) exception.getUndeclaredThrowable(), request);
 		} else {
 			// Caso não seja uma BusinessException, é lançada uma exceção genérica.
-			String message = messageSource.getMessage("error.server", new Object[]{e.getMessage()}, null);
+			String message = messageSource.getMessage("error.internal-server-error", null, null);
 			ResponseError error = responseError(message, HttpStatus.INTERNAL_SERVER_ERROR.value());
 			return handleExceptionInternal(e, error, headers(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 		}
